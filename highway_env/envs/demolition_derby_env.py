@@ -37,8 +37,9 @@ class DemolitionDerbyEnv(AbstractEnv):
                 "type": "Continuous",
             },
             "controlled_vehicles": 2,
-            "duration": 100,  # [s]
-            "derby_radius": 20.
+            "duration": 100.,  # [s]
+            "derby_radius": 20.,
+            "time_steps": 100.
         })
         return config
 
@@ -73,7 +74,7 @@ class DemolitionDerbyEnv(AbstractEnv):
             self.road.vehicles.append(vehicle)
             self.controlled_vehicles.append(vehicle)
 
-    def step(self, action: Action) -> Tuple[np.ndarray, float, bool, dict]:
+    def step(self) -> Tuple[np.ndarray, float, bool, dict]:
         """ 
         Step Forward in time
         Check for exiting boundary and collision 
@@ -89,12 +90,13 @@ class DemolitionDerbyEnv(AbstractEnv):
           2) linear approximation can be used to "roll back" time before collision
            
         """
-        # Checking position
+        dt = self.config["duration"]/self.config["time_steps"]
+        # update all positions
         for iCar in range(self.config["controlled_vehicles"]):
             Car = self.road.vehicles[iCar]
-            Position = Car.position
-            Heading = Car.heading
-            Velocity = Car.velocity
+            Car.step(dt)
+
+
 
 
     def _reward(self, action: Action) -> float:
