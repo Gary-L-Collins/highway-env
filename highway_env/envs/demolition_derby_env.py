@@ -79,42 +79,61 @@ class DemolitionDerbyEnv(AbstractEnv):
         Step Forward in time
         Check for exiting boundary and collision 
         If exit boundary, set radial velocity to zero. 
-          1) This is done by projecting position to radial coordinates 
-               (e.g. x,y -> r,theta via r2 = x2+y2, theta = atan(abs(y/x)) * a + b,
-               a = sign(x*y), b = 0 if x>0, pi if x<0).
-          2) Then setting r = rmax, x = r cos(theta), y = r sin(theta)
-          3) r' = 0, x' = -r sin(theta)*theta', y = r cos(theta) theta'
-               where theta' = 1/r * (-x'sin(theta)+y'cos(theta))
         If collision, determine striker and award accordingly
           1) collisions are checked with _check_collision func.
           2) linear approximation can be used to "roll back" time before collision
            
         """
         dt = self.config["duration"]/self.config["time_steps"]
+        r = self.config["derby_radius"];
 
-        # updating position
-        for vehicle in self.road.vehicles:
-            vehicle.step(dt)
+        obs, reward, terminal, info = super().step(action)
 
         # checking if exits boundary
         for vehicle in self.road.vehicles:
+            corners = corner_positions(vehicle)
+            corners_r2 = np.dot(corners, np.transpose(corners))
+            max_r2 = np.max(corners_r2)
+            # if a corner is beyond the circle, fix position and velocity
+            if max_r2 > r*r:
+                max_r = np.sqrt(max_r2)
+                unitC = corner/max_r
+                dr = max_r-r
+                indx = np.argmax(corners_r2)
+                corner = corners[indx,:]
+                vel = vehicle.velocity
+                # position, movedin the direction of the unit vector of corner and magnitude dr
+                vehicle.position = vehicle.position-unitC*dr
+
+                # projection of velocity onto corner to center vector then setting radial velocity to zero
+                radial_v = np.dot(unitC, vel)
+                vehicle.velocity = vel - unitC*radial_v
 
 
-        # checking for collisions
-        for vehicle in self.road.vehicles:
-            for other in self.road.vehicles:
-                vehicle.check_collision(other)
-            for other in self.road.objects:
-                vehicle.check_collision(other)
-
-        # update all positions
-
-#        for iCar in range(self.config["controlled_vehicles"]):
-#            Car = self.road.vehicles[iCar]
-#            Cardd.step(dt)
+            
 
 
+    @staticmethod
+    def corner_positions(vehicle: "Vehicle" = None)->np.array:
+        """
+        This method computes the position of each corner with a rotated car.
 
+        """
+        if vehicle is None:
+            return np.array([0,0],[0,0],[0,0],[0,0])
+        c = self.position
+        l = self.LENGTH
+        w = self.WIDTH
+        h = self.heading
+
+        c, s = np.cos(heading), np.sin(heading)
+        r = np.array([[c, -s], [s, c]])
+        corners = np.array([[l*0.5,w*0.5],[-l*0.5,w*0.5],[-l*0.5,-w*0.5],[l*0.5,-w*0.5]])
+
+        for i in range(4):
+            corners[i,:]=r.dot(corners[i,:])+c
+
+        return corners
 
     def _reward(self, action: Action) -> float:
         """
