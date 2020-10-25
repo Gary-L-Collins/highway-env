@@ -91,10 +91,27 @@ class DemolitionDerbyEnv(AbstractEnv):
            
         """
         dt = self.config["duration"]/self.config["time_steps"]
+
+        # updating position
+        for vehicle in self.road.vehicles:
+            vehicle.step(dt)
+
+        # checking if exits boundary
+        for vehicle in self.road.vehicles:
+
+
+        # checking for collisions
+        for vehicle in self.road.vehicles:
+            for other in self.road.vehicles:
+                vehicle.check_collision(other)
+            for other in self.road.objects:
+                vehicle.check_collision(other)
+
         # update all positions
-        for iCar in range(self.config["controlled_vehicles"]):
-            Car = self.road.vehicles[iCar]
-            Car.step(dt)
+
+#        for iCar in range(self.config["controlled_vehicles"]):
+#            Car = self.road.vehicles[iCar]
+#            Cardd.step(dt)
 
 
 
@@ -117,6 +134,6 @@ class DemolitionDerbyEnv(AbstractEnv):
 
 
 register(
-    id='highway-v0',
-    entry_point='highway_env.envs:HighwayEnv',
+    id='demolition_derby-v0',
+    entry_point='highway_env.envs:DemolitionDerby',
 )
