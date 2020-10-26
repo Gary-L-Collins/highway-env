@@ -74,11 +74,11 @@ class DemolitionDerbyEnv(AbstractEnv):
             self.road.vehicles.append(vehicle)
             self.controlled_vehicles.append(vehicle)
 
-    def step(self) -> Tuple[np.ndarray, float, bool, dict]:
+    def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, dict]:
         """ 
         Step Forward in time
         Check for exiting boundary and collision 
-        If exit boundary, set radial velocity to zero. 
+        If exit boundary, set radial velocity to zero and fix position to radius. 
         If collision, determine striker and award accordingly
           1) collisions are checked with _check_collision func.
           2) linear approximation can be used to "roll back" time before collision
@@ -86,8 +86,12 @@ class DemolitionDerbyEnv(AbstractEnv):
         """
         dt = self.config["duration"]/self.config["time_steps"]
         r = self.config["derby_radius"];
+        for iCar in range(self.config["controlled_vehicles"]):
+            vehicle = self.road.vehicles[iCar]
+            vehicle.act(action[iCar,:])
+            
 
-        obs, reward, terminal, info = super().step(action)
+        obs, reward, terminal, info = super().step(None)
 
         # checking if exits boundary
         for vehicle in self.road.vehicles:
@@ -108,10 +112,6 @@ class DemolitionDerbyEnv(AbstractEnv):
                 # projection of velocity onto corner to center vector then setting radial velocity to zero
                 radial_v = np.dot(unitC, vel)
                 vehicle.velocity = vel - unitC*radial_v
-
-
-            
-
 
     @staticmethod
     def corner_positions(vehicle: "Vehicle" = None)->np.array:
@@ -134,6 +134,7 @@ class DemolitionDerbyEnv(AbstractEnv):
             corners[i,:]=r.dot(corners[i,:])+c
 
         return corners
+
 
     def _reward(self, action: Action) -> float:
         """
