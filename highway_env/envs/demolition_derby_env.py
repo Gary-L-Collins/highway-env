@@ -3,10 +3,11 @@ from typing import Tuple
 from gym.envs.registration import register
 
 from highway_env import utils
-from highway_env.envs.common.abstract import AbstractEnv
-from highway_env.envs.common.action import Action
-from highway_env.road.road import Road, RoadNetwork
-from highway_env.vehicle.controller import ControlledVehicle
+from highway_env.envs.common.abstract import AbstractEnv, MultiAgentWrapper
+from highway_env.road.lane import LineType, StraightLane, CircularLane, AbstractLane
+from highway_env.road.regulation import RegulatedRoad
+from highway_env.road.road import RoadNetwork
+from highway_env.vehicle.kinematics import Vehicle
 
 
 class DemolitionDerbyEnv(AbstractEnv):
@@ -36,10 +37,9 @@ class DemolitionDerbyEnv(AbstractEnv):
             "action": {
                 "type": "Continuous",
             },
-            "controlled_vehicles": 2,
+            "controlled_vehicles": 1,
             "duration": 100.,  # [s]
             "derby_radius": 20.,
-            "time_steps": 100.
         })
         return config
 
@@ -79,19 +79,14 @@ class DemolitionDerbyEnv(AbstractEnv):
         Step Forward in time
         Check for exiting boundary and collision 
         If exit boundary, set radial velocity to zero and fix position to radius. 
-        If collision, determine striker and award accordingly
-          1) collisions are checked with _check_collision func.
-          2) linear approximation can be used to "roll back" time before collision
-           
         """
-        dt = self.config["duration"]/self.config["time_steps"]
         r = self.config["derby_radius"];
-        for iCar in range(self.config["controlled_vehicles"]):
-            vehicle = self.road.vehicles[iCar]
-            vehicle.act(action[iCar,:])
+        #for iCar in range(self.config["controlled_vehicles"]):
+        #    vehicle = self.road.vehicles[iCar]
+        #    vehicle.act(action[iCar,:])
             
-
-        obs, reward, terminal, info = super().step(None)
+        # action is none as the steps above already fill the actions of the cars
+        obs, reward, terminal, info = super().step(action)
 
         # checking if exits boundary
         for vehicle in self.road.vehicles:
@@ -112,6 +107,8 @@ class DemolitionDerbyEnv(AbstractEnv):
                 # projection of velocity onto corner to center vector then setting radial velocity to zero
                 radial_v = np.dot(unitC, vel)
                 vehicle.velocity = vel - unitC*radial_v
+
+
 
     @staticmethod
     def corner_positions(vehicle: "Vehicle" = None)->np.array:
@@ -153,7 +150,42 @@ class DemolitionDerbyEnv(AbstractEnv):
         return float(self.vehicle.crashed)
 
 
+class MultiAgentDemolitionDerbyEnv(DemolitionDerbyEnv):
+    @classmethod
+    def default_config(cls) -> dict:
+        config = super().default_config()
+        config.update({
+            "action": {
+                 "type": "MultiAgentAction",
+                 "action_config": {
+                     "type": "Continuous",
+                 }
+            },
+            "observation": {
+                "type": "MultiAgentObservation",
+                "observation_config": {
+                    "type": "Kinematics"
+                }
+            },
+            "controlled_vehicles": 2,
+            "duration": 100.,  # [s]
+            "derby_radius": 20.,
+        })
+        return config
+
+
+TupleMultiAgentDemolitionDerbyEnv = MultiAgentWrapper(MultiAgentDemolitionDerbyEnv)
+
 register(
     id='demolition_derby-v0',
     entry_point='highway_env.envs:DemolitionDerby',
+)
+register(
+    id='demolition_derby-multi-agent-v0',
+    entry_point='highway_env.envs:MultiAgentDemolitionDerbyEnv',
+)
+
+register(
+    id='demolition_derby-multi-agent-v1',
+    entry_point='highway_env.envs:TupleMultiAgentDemolitionDerbyEnv',
 )
