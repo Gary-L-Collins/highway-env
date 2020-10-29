@@ -142,8 +142,8 @@ class DemolitionDerbyEnv(AbstractEnv):
         rewards = []
         for i, vehicle in enumerate(vehicles):
             reward = 0
-            reward = self.config["crash_reward"] * vehicle.did_crash * np.sin(vehicle.crash_angle)
-            reward += self.config["got_crashed_reward"] * vehicle.got_crashed * np.sin(vehicle.crash_angle)
+            reward = self.config["did_crash_reward"][i] * vehicle.did_crash * abs(np.sin(vehicle.crash_angle))
+            reward += self.config["got_crashed_reward"][i] * vehicle.got_crashed * abs(np.sin(vehicle.crash_angle))
             rewards.append(reward)
         return tuple(rewards)
 
@@ -179,11 +179,11 @@ class DerbyCar(Vehicle):
         self.did_crash = 0
         if utils.point_in_rotated_rectangle(self.position, other.position, 0.9*other.LENGTH, 0.9*other.WIDTH, other.heading):
             self.got_crashed = 1
-            self.crash_angle = self.heading - other.heading
+            self.crash_angle = (self.heading - other.heading)
             c = 1
         if utils.point_in_rotated_rectangle(other.position, self.position, 0.9*self.LENGTH, 0.9*self.WIDTH, self.heading):
             self.did_crash = 1
-            self.crash_angle = self.heading - other.heading
+            self.crash_angle = (self.heading - other.heading)
             c = 1
         return c
     
