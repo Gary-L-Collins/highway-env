@@ -36,8 +36,7 @@ class DemolitionDerbyEnv(AbstractEnv):
             },
             "controlled_vehicles": 1,
             "duration": 100.,  # [s]
-            "derby_radius": 20.,
-            ""
+            "derby_radius": 20.
         })
         return config
 
@@ -105,6 +104,8 @@ class DemolitionDerbyEnv(AbstractEnv):
                 # projection of velocity onto corner to center vector then setting radial velocity to zero
                 radial_v = np.dot(unitC, vel)
                 vehicle.velocity = vel - unitC*radial_v
+        
+        info["agents_rewards"] = self._agent_rewards(action, self.controlled_vehicles)
 
 
 
@@ -137,16 +138,14 @@ class DemolitionDerbyEnv(AbstractEnv):
         """
         return 0
 
-    def _agent_reward(self, action: int, vehicle: Vehicle) -> float:
-        # reward = self.config["collision_reward"] * vehicle.crashed \
-        #          + self.HIGH_SPEED_REWARD * (vehicle.speed_index == vehicle.SPEED_COUNT - 1)
-        # reward = self.ARRIVED_REWARD if self.has_arrived(vehicle) else reward
-        # if self.config["normalize_reward"]:
-        #     reward = utils.lmap(reward, [self.config["collision_reward"], self.ARRIVED_REWARD], [0, 1])
-        reward = 0
-        reward = self.config["crash_reward"] * vehicle.did_crash * np.sin(vehicle.crash_angle)
-        reward += self.config["got_crashed_reward"] * vehicle.got_crashed * np.sin(vehicle.crash_angle)
-        return reward
+    def _agent_rewards(self, action: int, vehicles: tuple) -> float:
+        rewards = []
+        for i, vehicle in enumerate(vehicles):
+            reward = 0
+            reward = self.config["crash_reward"] * vehicle.did_crash * np.sin(vehicle.crash_angle)
+            reward += self.config["got_crashed_reward"] * vehicle.got_crashed * np.sin(vehicle.crash_angle)
+            rewards.append(reward)
+        return tuple(rewards)
 
     def _is_terminal(self) -> bool:
         """The episode is over if the ego vehicle crashed or the time is out."""
@@ -176,13 +175,13 @@ class DerbyCar(Vehicle):
             return False
         # Accurate point-inside checks
         c = 0
+        self.got_crashed = 0
+        self.did_crash = 0
         if utils.point_in_rotated_rectangle(self.position, other.position, 0.9*other.LENGTH, 0.9*other.WIDTH, other.heading):
             self.got_crashed = 1
-            self.did_crash = 0
             self.crash_angle = self.heading - other.heading
             c = 1
         if utils.point_in_rotated_rectangle(other.position, self.position, 0.9*self.LENGTH, 0.9*self.WIDTH, self.heading):
-            self.got_crashed = 0
             self.did_crash = 1
             self.crash_angle = self.heading - other.heading
             c = 1
@@ -209,6 +208,8 @@ class MultiAgentDemolitionDerbyEnv(DemolitionDerbyEnv):
             "controlled_vehicles": 2,
             "duration": 100.,  # [s]
             "derby_radius": 20.,
+            "did_crash_rewards": [1.0, 1.0],
+            "got_crashed_rewards": [1.0, 1.0]
         })
         return config
 
