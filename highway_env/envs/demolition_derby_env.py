@@ -110,7 +110,7 @@ class DemolitionDerbyEnv(AbstractEnv):
 
 
     @staticmethod
-    def corner_positions(vehicle: "Vehicle" = None)->np.array:
+    def corner_positions(self, vehicle: "Vehicle" = None)->np.array:
         """
         This method computes the position of each corner with a rotated car.
 
