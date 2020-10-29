@@ -116,10 +116,12 @@ class DemolitionDerbyEnv(AbstractEnv):
 
 
 
-    def _reward(self, action: Action) -> float:
+    def _reward(self, action: np.ndarray) -> float:
         """
         Reward for hitting, and cost for being hit. +-Sin(heading difference)
         """
+        for vehicle in self.road.vehicles:
+            if vehicle.position
         return reward
 
     def _is_terminal(self) -> bool:
