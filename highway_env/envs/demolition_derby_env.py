@@ -180,10 +180,12 @@ class DerbyCar(Vehicle):
         if utils.point_in_rotated_rectangle(self.position, other.position, 0.9*other.LENGTH, 0.9*other.WIDTH, other.heading):
             self.got_crashed = 1
             self.did_crash = 0
+            self.crash_angle = abs(self.heading - other.heading)
             c = 1
         if utils.point_in_rotated_rectangle(other.position, self.position, 0.9*self.LENGTH, 0.9*self.WIDTH, self.heading):
             self.got_crashed = 0
             self.did_crash = 1
+            self.crash_angle = abs(self.heading - other.heading)
             c = 1
         return c
     
