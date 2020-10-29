@@ -144,9 +144,7 @@ class DemolitionDerbyEnv(AbstractEnv):
         # if self.config["normalize_reward"]:
         #     reward = utils.lmap(reward, [self.config["collision_reward"], self.ARRIVED_REWARD], [0, 1])
         reward = 0
-        if vehicle.crashed:
-            
-        reward = self.config["crash_reward"] * vehicle.crash * np.sin(vehicle.crash_angle)
+        reward = self.config["crash_reward"] * vehicle.did_crash * np.sin(vehicle.crash_angle)
         reward += self.config["got_crashed_reward"] * vehicle.got_crashed * np.sin(vehicle.crash_angle)
         return reward
 
@@ -168,6 +166,7 @@ class DerbyCar(Vehicle):
                  speed: float = 0):
         super().__init__(road, position, heading, speed)
         self.got_crashed = False
+        self.did_crash = False
         self.crash_angle = 0.0
         
     
@@ -180,12 +179,12 @@ class DerbyCar(Vehicle):
         if utils.point_in_rotated_rectangle(self.position, other.position, 0.9*other.LENGTH, 0.9*other.WIDTH, other.heading):
             self.got_crashed = 1
             self.did_crash = 0
-            self.crash_angle = abs(self.heading - other.heading)
+            self.crash_angle = self.heading - other.heading
             c = 1
         if utils.point_in_rotated_rectangle(other.position, self.position, 0.9*self.LENGTH, 0.9*self.WIDTH, self.heading):
             self.got_crashed = 0
             self.did_crash = 1
-            self.crash_angle = abs(self.heading - other.heading)
+            self.crash_angle = self.heading - other.heading
             c = 1
         return c
     
