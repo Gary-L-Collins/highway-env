@@ -19,14 +19,11 @@ class DemolitionDerbyEnv(AbstractEnv):
 
     """
 
-    RIGHT_LANE_REWARD: float = 0.1
+    CRASH_REWARD: float = 0.1
     """The reward received when driving on the right-most lanes, linearly mapped to zero for other lanes."""
 
-    HIGH_SPEED_REWARD: float = 0.4
+    GOT_CRASHED_REWARD: float = 0.4
     """The reward received when driving at full speed, linearly mapped to zero for lower speeds according to config["reward_speed_range"]."""
-
-    LANE_CHANGE_REWARD: float = 0
-    """The reward received at each lane change action."""
 
     def default_config(self) -> dict:
         config = super().default_config()
@@ -40,6 +37,7 @@ class DemolitionDerbyEnv(AbstractEnv):
             "controlled_vehicles": 1,
             "duration": 100.,  # [s]
             "derby_radius": 20.,
+            ""
         })
         return config
 
@@ -137,8 +135,19 @@ class DemolitionDerbyEnv(AbstractEnv):
         """
         Reward for hitting, and cost for being hit. +-Sin(heading difference)
         """
-        for vehicle in self.road.vehicles:
-            if vehicle.position
+        return 0
+
+    def _agent_reward(self, action: int, vehicle: Vehicle) -> float:
+        # reward = self.config["collision_reward"] * vehicle.crashed \
+        #          + self.HIGH_SPEED_REWARD * (vehicle.speed_index == vehicle.SPEED_COUNT - 1)
+        # reward = self.ARRIVED_REWARD if self.has_arrived(vehicle) else reward
+        # if self.config["normalize_reward"]:
+        #     reward = utils.lmap(reward, [self.config["collision_reward"], self.ARRIVED_REWARD], [0, 1])
+        reward = 0
+        if vehicle.crashed:
+            
+        reward = self.config["crash_reward"] * vehicle.crash * np.sin(vehicle.crash_angle)
+        reward += self.config["got_crashed_reward"] * vehicle.got_crashed * np.sin(vehicle.crash_angle)
         return reward
 
     def _is_terminal(self) -> bool:
@@ -151,6 +160,33 @@ class DemolitionDerbyEnv(AbstractEnv):
         """The cost signal is the occurrence of collision."""
         return float(self.vehicle.crashed)
 
+class DerbyCar(Vehicle):
+    def __init__(self,
+                 road: Road,
+                 position: Vector,
+                 heading: float = 0,
+                 speed: float = 0):
+        super().__init__(road, position, heading, speed)
+        self.got_crashed = False
+        self.crash_angle = 0.0
+        
+    
+    def _is_colliding(self, other):
+        # Fast spherical pre-check
+        if np.linalg.norm(other.position - self.position) > self.LENGTH:
+            return False
+        # Accurate point-inside checks
+        c = 0
+        if utils.point_in_rotated_rectangle(self.position, other.position, 0.9*other.LENGTH, 0.9*other.WIDTH, other.heading):
+            self.got_crashed = 1
+            self.did_crash = 0
+            c = 1
+        if utils.point_in_rotated_rectangle(other.position, self.position, 0.9*self.LENGTH, 0.9*self.WIDTH, self.heading):
+            self.got_crashed = 0
+            self.did_crash = 1
+            c = 1
+        return c
+    
 
 class MultiAgentDemolitionDerbyEnv(DemolitionDerbyEnv):
     @classmethod
