@@ -36,7 +36,7 @@ class DemolitionDerbyEnv(AbstractEnv):
             },
             "controlled_vehicles": 1,
             "duration": 100.,  # [s]
-            "derby_radius": 20.
+            "derby_radius": 100.
         })
         return config
 
