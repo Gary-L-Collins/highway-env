@@ -203,7 +203,7 @@ class MultiAgentDemolitionDerbyEnv(DemolitionDerbyEnv):
             "action": {
                  "type": "MultiAgentAction",
                  "action_config": {
-                     "type": "Continuous",
+                     "type": "ContinuousAction",
                  }
             },
             "observation": {
