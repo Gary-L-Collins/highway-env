@@ -35,7 +35,7 @@ class DemolitionDerbyEnv(AbstractEnv):
                 "type": "Kinematics"
             },
             "action": {
-                "type": "Continuous",
+                "type": "ContinuousAction",
             },
             "controlled_vehicles": 1,
             "duration": 100.,  # [s]
