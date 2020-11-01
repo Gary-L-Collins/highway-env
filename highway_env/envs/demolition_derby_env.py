@@ -27,7 +27,8 @@ class DemolitionDerbyEnv(AbstractEnv):
     GOT_CRASHED_REWARD: float = 0.4
     """The reward received when driving at full speed, linearly mapped to zero for lower speeds according to config["reward_speed_range"]."""
 
-    def default_config(self) -> dict:
+    @classmethod
+    def default_config(cls) -> dict:
         config = super().default_config()
         config.update({
             "observation": {
