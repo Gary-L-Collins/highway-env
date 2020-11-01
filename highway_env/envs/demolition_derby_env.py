@@ -76,7 +76,7 @@ class DemolitionDerbyEnv(AbstractEnv):
             self.controlled_vehicles.append(vehicle)
         path = "highway_env.envs.demolition_derby_env.DerbyCar"
         # changing to our vehicle
-        change_vehicles(path)
+        self.change_vehicles(path)
 
     def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, dict]:
         """ 
