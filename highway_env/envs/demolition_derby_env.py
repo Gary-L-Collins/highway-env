@@ -33,6 +33,7 @@ class DemolitionDerbyEnv(AbstractEnv):
         config.update({
             "observation": {
                 "type": "Kinematics"
+                "features": ['x', 'y', 'vx', 'vy', 'heading'],
             },
             "action": {
                 "type": "ContinuousAction",
