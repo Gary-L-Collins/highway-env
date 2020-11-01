@@ -226,7 +226,7 @@ TupleMultiAgentDemolitionDerbyEnv = MultiAgentWrapper(MultiAgentDemolitionDerbyE
 
 register(
     id='demolition_derby-v0',
-    entry_point='highway_env.envs:DemolitionDerby',
+    entry_point='highway_env.envs:DemolitionDerbyEnv',
 )
 register(
     id='demolition_derby-multi-agent-v0',
