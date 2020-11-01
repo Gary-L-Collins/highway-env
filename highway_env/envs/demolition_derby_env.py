@@ -32,8 +32,8 @@ class DemolitionDerbyEnv(AbstractEnv):
         config = super().default_config()
         config.update({
             "observation": {
-                "type": "Kinematics"
-                "features": ['x', 'y', 'vx', 'vy', 'heading'],
+                "type": "Kinematics",
+                "features": ['x', 'y', 'vx', 'vy', 'heading']
             },
             "action": {
                 "type": "ContinuousAction",
@@ -209,7 +209,8 @@ class MultiAgentDemolitionDerbyEnv(DemolitionDerbyEnv):
             "observation": {
                 "type": "MultiAgentObservation",
                 "observation_config": {
-                    "type": "Kinematics"
+                    "type": "Kinematics",
+                    "features": ['x', 'y', 'vx', 'vy', 'heading']
                 }
             },
             "controlled_vehicles": 2,
