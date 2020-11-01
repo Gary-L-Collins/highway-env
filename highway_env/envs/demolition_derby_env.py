@@ -145,7 +145,7 @@ class DemolitionDerbyEnv(AbstractEnv):
         rewards = []
         for i, vehicle in enumerate(vehicles):
             reward = 0
-            reward = self.config["did_crash_reward"][i] * vehicle.did_crash * abs(np.sin(vehicle.crash_angle)) * vehicle.velocity
+            reward = self.config["did_crash_reward"][i] * vehicle.did_crash * abs(np.sin(vehicle.crash_angle)) * (vehicle.velocity / vehicle.MAX_SPEED) ** 2
             reward += self.config["got_crashed_reward"][i] * vehicle.got_crashed * abs(np.sin(vehicle.crash_angle))
             rewards.append(reward)
         return tuple(rewards)
