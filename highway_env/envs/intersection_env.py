@@ -2,9 +2,9 @@ from typing import Dict, Tuple
 
 from gym.envs.registration import register
 import numpy as np
-
+from gym import Wrapper
 from highway_env import utils
-from highway_env.envs.common.abstract import AbstractEnv, MultiAgentWrapper
+from highway_env.envs.common.abstract import AbstractEnv
 from highway_env.road.lane import LineType, StraightLane, CircularLane, AbstractLane
 from highway_env.road.regulation import RegulatedRoad
 from highway_env.road.road import RoadNetwork
@@ -241,6 +241,7 @@ class IntersectionEnv(AbstractEnv):
 class MultiAgentIntersectionEnv(IntersectionEnv):
     @classmethod
     def default_config(cls) -> dict:
+
         config = super().default_config()
         config.update({
             "action": {
@@ -261,8 +262,22 @@ class MultiAgentIntersectionEnv(IntersectionEnv):
         })
         return config
 
+class MultiAgentWrapper(Wrapper):
+    def __init__(self, env = MultiAgentIntersectionEnv()):
+        super().__init__(env)
+        
 
-TupleMultiAgentIntersectionEnv = MultiAgentWrapper(MultiAgentIntersectionEnv)
+    def step(self, action):
+
+        obs, reward, done, info = self.step(action)
+
+        reward = info["agents_rewards"]
+        done = info["agents_dones"]
+        return obs, reward, done, info
+
+# aa=
+#
+# TupleMultiAgentIntersectionEnv = MultiAgentWrapper(aa)
 
 
 register(
@@ -277,5 +292,5 @@ register(
 
 register(
     id='intersection-multi-agent-v1',
-    entry_point='highway_env.envs:TupleMultiAgentIntersectionEnv',
+    entry_point='highway_env.envs:MultiAgentWrapper',
 )

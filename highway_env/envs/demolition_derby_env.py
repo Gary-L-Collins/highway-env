@@ -1,9 +1,9 @@
 import numpy as np
 from typing import Tuple
 from gym.envs.registration import register
-
+from gym import Wrapper
 from highway_env import utils
-from highway_env.envs.common.abstract import AbstractEnv, MultiAgentWrapper
+from highway_env.envs.common.abstract import AbstractEnv
 from highway_env.road.lane import LineType, StraightLane, CircularLane, AbstractLane
 from highway_env.road.road import Road, LaneIndex
 from highway_env.types import Vector
@@ -15,7 +15,7 @@ from highway_env.vehicle.kinematics import Vehicle
 class DemolitionDerbyEnv(AbstractEnv):
     """
     A demolition derby environment.
-    
+
     Two vehicles are inclined to collide into the side of the other and
     avoid being struck on the side ("T-Boning").
 
@@ -79,16 +79,16 @@ class DemolitionDerbyEnv(AbstractEnv):
         self.change_vehicles(path)
 
     def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, dict]:
-        """ 
+        """
         Step Forward in time
-        Check for exiting boundary and collision 
-        If exit boundary, set radial velocity to zero and fix position to radius. 
+        Check for exiting boundary and collision
+        If exit boundary, set radial velocity to zero and fix position to radius.
         """
         r = self.config["derby_radius"];
         #for iCar in range(self.config["controlled_vehicles"]):
         #    vehicle = self.road.vehicles[iCar]
         #    vehicle.act(action[iCar,:])
-            
+
         # action is none as the steps above already fill the actions of the cars
         obs, reward, terminal, info = super().step(action)
 
@@ -111,8 +111,9 @@ class DemolitionDerbyEnv(AbstractEnv):
                 # projection of velocity onto corner to center vector then setting radial velocity to zero
                 radial_v = np.dot(unitC, vel)
                 vehicle.velocity = vel - unitC*radial_v
-        
+
         info["agents_rewards"] = self._agent_rewards(action, self.controlled_vehicles)
+        return obs, reward, terminal, info
 
 
 
@@ -174,8 +175,8 @@ class DerbyCar(Vehicle):
         self.got_crashed = False
         self.did_crash = False
         self.crash_angle = 0.0
-        
-    
+
+
     def _is_colliding(self, other):
         # Fast spherical pre-check
         if np.linalg.norm(other.position - self.position) > self.LENGTH:
@@ -193,7 +194,7 @@ class DerbyCar(Vehicle):
             self.crash_angle = (self.heading - other.heading)
             c = 1
         return c
-    
+
 
 class MultiAgentDemolitionDerbyEnv(DemolitionDerbyEnv):
     @classmethod
@@ -221,12 +222,24 @@ class MultiAgentDemolitionDerbyEnv(DemolitionDerbyEnv):
         })
         return config
 
+class MultiAgentWrapper_demolition_derby(Wrapper):
+    def __init__(self, env = MultiAgentDemolitionDerbyEnv()):
+        super().__init__(env)
 
-TupleMultiAgentDemolitionDerbyEnv = MultiAgentWrapper(MultiAgentDemolitionDerbyEnv)
+
+    def step(self, action):
+
+        obs, reward, done, info = self.step(action)
+
+        reward = info["agents_rewards"]
+        done = info["agents_dones"]
+        return obs, reward, done, info
+
+#TupleMultiAgentDemolitionDerbyEnv = MultiAgentWrapper(MultiAgentDemolitionDerbyEnv)
 
 register(
     id='demolition_derby-v0',
-    entry_point='highway_env.envs:DemolitionDerby',
+    entry_point='highway_env.envs:DemolitionDerbyEnv',
 )
 register(
     id='demolition_derby-multi-agent-v0',
@@ -235,5 +248,5 @@ register(
 
 register(
     id='demolition_derby-multi-agent-v1',
-    entry_point='highway_env.envs:TupleMultiAgentDemolitionDerbyEnv',
+    entry_point='highway_env.envs:MultiAgentWrapper_demolition_derby',
 )
