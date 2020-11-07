@@ -33,14 +33,26 @@ class DemolitionDerbyEnv(AbstractEnv):
         config.update({
             "observation": {
                 "type": "Kinematics",
-                "features": ['x', 'y', 'vx', 'vy', 'heading']
+                "features": ['x', 'y', 'vx', 'vy', 'heading'],
+                "vehicles_count": 2,
+                "features_range": {
+                    "x": [-100., 100.],
+                    "y": [-100., 100.],
+                    "vx": [-40., 40.],
+                    "vy": [-40., 40.]
+                    },
+                "see_behind": True,
+                "clip": False
+
             },
             "action": {
                 "type": "ContinuousAction",
             },
             "controlled_vehicles": 1,
             "duration": 100.,  # [s]
-            "derby_radius": 100.
+            "derby_radius": 100.,
+            "did_crash_rewards": [1.0, 1.0],
+            "got_crashed_rewards": [1.0, 1.0]
         })
         return config
 
@@ -69,9 +81,10 @@ class DemolitionDerbyEnv(AbstractEnv):
         for i in range(self.config["controlled_vehicles"]):
             XPos = self.np_random.rand()*self.config["derby_radius"]*1.5-self.config["derby_radius"]*.75
             YPos = self.np_random.rand()*self.config["derby_radius"]*1.5-self.config["derby_radius"]*.75
+            print(XPos,YPos)
             Heading = 2*np.pi*self.np_random.rand()
             Speed = 0.
-            vehicle = self.action_type.vehicle_class(self.road, [XPos, YPos], Heading, Speed)
+            vehicle = self.action_type.vehicle_class(road=self.road, position=np.array([XPos, YPos]), heading=Heading, speed=Speed)
             self.road.vehicles.append(vehicle)
             self.controlled_vehicles.append(vehicle)
         path = "highway_env.envs.demolition_derby_env.DerbyCar"
@@ -210,12 +223,21 @@ class MultiAgentDemolitionDerbyEnv(DemolitionDerbyEnv):
                 "type": "MultiAgentObservation",
                 "observation_config": {
                     "type": "Kinematics",
-                    "features": ['x', 'y', 'vx', 'vy', 'heading']
+                    "features": ['x', 'y', 'vx', 'vy', 'heading'],
+                    "vehicles_count": 2,
+                    "features_range": {
+                        "x": [-100., 100.],
+                        "y": [-100., 100.],
+                        "vx": [-40., 40.],
+                        "vy": [-40., 40.]
+                        },
+                    "see_behind": True,
+                    "clip": False
                 }
             },
             "controlled_vehicles": 2,
             "duration": 100.,  # [s]
-            "derby_radius": 20.,
+            "derby_radius": 100.,
             "did_crash_rewards": [1.0, 1.0],
             "got_crashed_rewards": [1.0, 1.0]
         })
