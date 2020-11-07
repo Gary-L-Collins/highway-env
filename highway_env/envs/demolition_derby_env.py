@@ -166,10 +166,11 @@ class DemolitionDerbyEnv(AbstractEnv):
 
     def _agent_rewards(self, action: int, vehicles: tuple) -> float:
         rewards = []
+        Speed = np.linalg.norm(self.road.vehicles[0].velocity-self.road.vehicles[1].velocity)
         for i, vehicle in enumerate(vehicles):
             reward = 0
-            reward = self.config["did_crash_rewards"][i] * vehicle.did_crash * abs(np.sin(vehicle.crash_angle)) * (vehicle.velocity / vehicle.MAX_SPEED) ** 2
-            reward += self.config["got_crashed_rewards"][i] * vehicle.got_crashed * abs(np.sin(vehicle.crash_angle))
+            reward = self.config["did_crash_rewards"][i] * vehicle.did_crash * abs(np.sin(vehicle.crash_angle)) * (vehicle.crash_speed2)
+            reward -= self.config["got_crashed_rewards"][i] * vehicle.got_crashed * abs(np.sin(vehicle.crash_angle)) * (vehicle.crash_speed2)
             rewards.append(reward)
         return tuple(rewards)
 
