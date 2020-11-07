@@ -81,7 +81,6 @@ class DemolitionDerbyEnv(AbstractEnv):
         """Create some new random vehicles of a given type, and add them on the road."""
         path = "highway_env.vehicle.derby.DerbyCar"
         vehicle_class = utils.class_from_path(path)
-        print(vehicle_class)
         self.controlled_vehicles = []
         for i in range(self.config["controlled_vehicles"]):
             XPos = self.np_random.rand()*self.config["derby_radius"]*1.5-self.config["derby_radius"]*.75
@@ -157,6 +156,7 @@ class DemolitionDerbyEnv(AbstractEnv):
                 #vehicle.direction = vel/vehicle.speed
         
         info["agents_rewards"] = self._agent_rewards(action, self.controlled_vehicles)
+        return [obs,reward,terminal,info]
 
     def _reward(self, action: np.ndarray) -> float:
         """
