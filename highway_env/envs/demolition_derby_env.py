@@ -62,18 +62,44 @@ class DemolitionDerbyEnv(AbstractEnv):
         self._create_road()
         self._create_vehicles()
 
+#    def _create_road(self) -> None:
+#        """ circular road that acts as boundarys for derby """
+#        center = [0, 0]  # [m]
+#        alpha = 24  # [deg]
+#        radius = self.config["derby_radius"]
+#
+#        net = RoadNetwork()
+#        radii = [radius, radius+4]
+#        n, c, s = LineType.NONE, LineType.CONTINUOUS, LineType.STRIPED
+#        line = [[c, s], [n, c]]
+#        net.add_lane("e", "w", CircularLane(center, radius, 0, np.pi, clockwise=False, line_types=line[0], speed_limit=1000))
+#        net.add_lane("w", "e", CircularLane(center, radius, np.pi, 0, clockwise=False, line_types=line[0], speed_limit=1000))
+#        road = Road(network=net, np_random=self.np_random, record_history=self.config["show_trajectories"])
+#        self.road = road
+
     def _create_road(self) -> None:
-        """ circular road that acts as boundarys for derby """
+        
+        # Circle lanes: (s)outh/(e)ast/(n)orth/(w)est (e)ntry/e(x)it.
         center = [0, 0]  # [m]
-        alpha = 24  # [deg]
-        radius = self.config["derby_radius"]
+        radius=50
+        #radius = self.config["derby_radius"]  # [m]
+        alpha = 90  # [deg]
 
         net = RoadNetwork()
-        radii = [radius, radius+4]
-        n, c, s = LineType.NONE, LineType.CONTINUOUS, LineType.STRIPED
+        radii = [radius]
+        n, c, s = LineType.NONE, LineType.CONTINUOUS, LineType.CONTINUOUS
         line = [[c, s], [n, c]]
-        net.add_lane("e", "w", CircularLane(center, radius, 0, np.pi, clockwise=False, line_types=line[0], speed_limit=1000))
-        net.add_lane("w", "e", CircularLane(center, radius, np.pi, 0, clockwise=False, line_types=line[0], speed_limit=1000))
+        for lane in [0]:
+
+            net.add_lane("se", "ee",
+                         CircularLane(center, radii[lane], np.deg2rad(-90-alpha), np.deg2rad(alpha),
+                                      clockwise=True, line_types=line[lane]))
+            net.add_lane("ee", "se",
+                         CircularLane(center, radii[lane], np.deg2rad(alpha-2), np.deg2rad(92+alpha),
+                                      clockwise=True, line_types=line[lane]))
+
+
+
         road = Road(network=net, np_random=self.np_random, record_history=self.config["show_trajectories"])
         self.road = road
 

@@ -52,7 +52,7 @@ class WorldSurface(pygame.Surface):
         :param y: y world coordinate [m]
         :return: the coordinates of the corresponding pixel [px]
         """
-        return self.pix(x - self.origin[0]), self.pix(y - self.origin[1])
+        return self.pix(x - self.origin[0])+200, self.pix(y - self.origin[1])
 
     def vec2pix(self, vec: PositionType) -> Tuple[int, int]:
         """
