@@ -81,8 +81,8 @@ class DemolitionDerbyEnv(AbstractEnv):
         
         # Circle lanes: (s)outh/(e)ast/(n)orth/(w)est (e)ntry/e(x)it.
         center = [0, 0]  # [m]
-        radius=50
-        #radius = self.config["derby_radius"]  # [m]
+        
+        radius = self.config["derby_radius"]  # [m]
         alpha = 90  # [deg]
 
         net = RoadNetwork()
