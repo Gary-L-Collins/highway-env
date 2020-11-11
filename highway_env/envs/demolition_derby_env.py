@@ -92,10 +92,10 @@ class DemolitionDerbyEnv(AbstractEnv):
         for lane in [0]:
 
             net.add_lane("se", "ee",
-                         CircularLane(center, radii[lane], np.deg2rad(-90-alpha), np.deg2rad(alpha),
+                         CircularLane(center, radii[lane], np.deg2rad(-90-alpha), np.deg2rad(alpha+5),
                                       clockwise=True, line_types=line[lane]))
             net.add_lane("ee", "se",
-                         CircularLane(center, radii[lane], np.deg2rad(alpha-2), np.deg2rad(92+alpha),
+                         CircularLane(center, radii[lane], np.deg2rad(alpha-5), np.deg2rad(92+alpha),
                                       clockwise=True, line_types=line[lane]))
 
 

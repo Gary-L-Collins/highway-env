@@ -24,7 +24,7 @@ class WorldSurface(pygame.Surface):
     GREEN = (50, 200, 0)
     YELLOW = (200, 200, 0)
     WHITE = (255, 255, 255)
-    INITIAL_SCALING = 5.5
+    INITIAL_SCALING = 4
     INITIAL_CENTERING = [0.5, 0.5]
     SCALING_FACTOR = 1.3
     MOVING_FACTOR = 0.1
@@ -32,7 +32,7 @@ class WorldSurface(pygame.Surface):
     def __init__(self, size: Tuple[int, int], flags: object, surf: pygame.SurfaceType) -> None:
         super().__init__(size, flags, surf)
         self.origin = np.array([0, 0])
-        self.scaling = self.INITIAL_SCALING
+        self.scaling = 4
         self.centering_position = self.INITIAL_CENTERING
 
     def pix(self, length: float) -> int:
@@ -42,7 +42,7 @@ class WorldSurface(pygame.Surface):
         :param length: the input distance [m]
         :return: the corresponding size [px]
         """
-        return int(length * self.scaling)
+        return int(length * 4)
 
     def pos2pix(self, x: float, y: float) -> Tuple[int, int]:
         """
@@ -52,7 +52,7 @@ class WorldSurface(pygame.Surface):
         :param y: y world coordinate [m]
         :return: the coordinates of the corresponding pixel [px]
         """
-        return self.pix(x - self.origin[0])+200, self.pix(y - self.origin[1])
+        return self.pix(x - self.origin[0])+300, self.pix(y - self.origin[1])+70
 
     def vec2pix(self, vec: PositionType) -> Tuple[int, int]:
         """
