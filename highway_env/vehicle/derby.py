@@ -48,5 +48,7 @@ class DerbyCar(Vehicle):
             other.got_crashed = 1
             self.crash_angle = (self.heading - other.heading)
             other.crash_angle = self.crash_angle
+            self.crash_speed2  = np.sum(np.multiply(self.velocity-other.velocity,self.velocity-other.velocity))
+            other.crash_speed2 = self.crash_speed2
             c = 1
         return c
