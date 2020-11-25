@@ -14,6 +14,7 @@ from highway_env.envs.common.graphics import EnvViewer
 from highway_env.vehicle.behavior import IDMVehicle, LinearVehicle
 from highway_env.vehicle.controller import MDPVehicle
 from highway_env.vehicle.kinematics import Vehicle
+from highway_env.vehicle.derby import DerbyCar
 
 Observation = np.ndarray
 
