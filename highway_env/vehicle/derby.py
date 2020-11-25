@@ -32,23 +32,51 @@ class DerbyCar(Vehicle):
         self.did_crash = 0
         other.got_crashed = 0
         other.did_crash = 0
-        if utils.point_in_rotated_rectangle(self.position, other.position, 0.9*other.LENGTH, 0.9*other.WIDTH, other.heading):
-            print(self," was hit by ",other)
-            self.got_crashed = 1
-            other.did_crash  = 1
-            self.crash_angle  = (self.heading - other.heading)
-            other.crash_angle = self.crash_angle
-            self.crash_speed2  = np.sum(np.multiply(self.velocity-other.velocity,self.velocity-other.velocity))
-            other.crash_speed2 = self.crash_speed2
+        if utils.point_in_rotated_rectangle(self.position, other.position, 0.9*other.LENGTH, 0.9*other.WIDTH, other.heading) or utils.point_in_rotated_rectangle(other.position, self.position, 0.9*self.LENGTH, 0.9*self.WIDTH, self.heading):
+            # Determine who hit who (striker is the one with the smallest angle between the line connecting the two centers and their heading)
+            pos_self=np.array(self.position)
+            pos_other=np.array(other.position)
+            CenterVector = (pos_other-pos_self)/np.linalg.norm(pos_other-pos_self)
+            if self.speed != 0.0:
+                SelfHVec = np.array(self.velocity,dtype=np.float32)/np.fabs(1.0*self.speed)
+            else:
+                SelfHVec = np.array([0,0],dtype=np.float32)
+                SelfHVec[0] += CenterVector[1]
+                SelfHVec[1] += -1.0*CenterVector[0]
+            if other.speed != 0.0:
+                OtherHVec = np.array(other.velocity,dtype=np.float32)/np.fabs(1.0*other.speed)
+            else:
+                OtherHVec = np.array([0,0],dtype=np.float32)
+                OtherHVec[0] += CenterVector[1]
+                OtherHVec[1] += -1.0*CenterVector[0]
+            SelfCosAlpha = SelfHVec[0]*CenterVector[0]+SelfHVec[1]*CenterVector[1]
+            OtherCosAlpha = -OtherHVec[0]*CenterVector[0]-OtherHVec[1]*CenterVector[1] #minus because the vector connecting two cars is pointed towards the "other" car
 
-            c = 1
-        if utils.point_in_rotated_rectangle(other.position, self.position, 0.9*self.LENGTH, 0.9*self.WIDTH, self.heading):
-            print(self," hit ",other)
-            self.did_crash = 1
-            other.got_crashed = 1
-            self.crash_angle = (self.heading - other.heading)
-            other.crash_angle = self.crash_angle
-            self.crash_speed2  = np.sum(np.multiply(self.velocity-other.velocity,self.velocity-other.velocity))
-            other.crash_speed2 = self.crash_speed2
-            c = 1
+            if SelfCosAlpha>OtherCosAlpha:
+                print(self," hit ",other)
+                self.did_crash = 1
+                other.got_crashed = 1
+                self.crash_angle = (self.heading - other.heading)
+                other.crash_angle = self.crash_angle
+                self.crash_speed2  = np.sum(np.multiply(self.velocity-other.velocity,self.velocity-other.velocity))
+                other.crash_speed2 = self.crash_speed2
+                c = 1
+            elif OtherCosAlpha>SelfCosAlpha:
+                print(self," was hit by ",other)
+                self.got_crashed = 1
+                other.did_crash  = 1
+                self.crash_angle  = (self.heading - other.heading)
+                other.crash_angle = self.crash_angle
+                self.crash_speed2  = np.sum(np.multiply(self.velocity-other.velocity,self.velocity-other.velocity))
+                other.crash_speed2 = self.crash_speed2
+                c = 1
+            else:
+                print("Double Collision, both lose")
+                self.got_crashed = 1
+                other.got_crashed = 1
+                self.crash_angle  = (self.heading - other.heading)
+                other.crash_angle = self.crash_angle
+                self.crash_speed2  = np.sum(np.multiply(self.velocity-other.velocity,self.velocity-other.velocity))
+                other.crash_speed2 = self.crash_speed2
+                c = 1
         return c
