@@ -80,6 +80,7 @@ def find_initial_impact(v1: "Vehicle" = None, v2: "Vehicle" = None)->np.array:
             corners = corner_positions(v1)
             for i in range(4):
                 if utils.point_in_rotated_rectangle(corners[i,:],v2.position,v2.LENGTH,v2.WIDTH,v2.heading):
+                    print("hit")
                     corner_avg[0]+=corners[i,0]
                     corner_avg[1]+=corners[i,1]
                     ncorner+=1.
@@ -89,6 +90,7 @@ def find_initial_impact(v1: "Vehicle" = None, v2: "Vehicle" = None)->np.array:
             corners = corner_positions(v2)
             for i in range(4):
                 if utils.point_in_rotated_rectangle(corners[i,:],v1.position,v1.LENGTH,v1.WIDTH,v1.heading):
+                    print("hit")
                     corner_avg[0]+=corners[i,0]
                     corner_avg[1]+=corners[i,1]
                     ncorner+=1.
