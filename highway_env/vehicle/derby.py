@@ -24,6 +24,8 @@ def corner_positions(v: "Vehicle" = None)->np.array:
     c, s = np.cos(a1), np.sin(a1)
     r = np.array([[c, -s], [s, c]])
     corners = r.dot(r1_points.transpose()).transpose()
+    corners = corners+c1
+    print(corners)
     return corners
 
 def find_initial_impact(v1: "Vehicle" = None, v2: "Vehicle" = None)->np.array:
