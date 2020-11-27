@@ -51,7 +51,7 @@ def find_initial_impact(v1: "Vehicle" = None, v2: "Vehicle" = None)->np.array:
     t2=t
     if utils.rotated_rectangles_intersect((v1.position,v1.LENGTH,v1.WIDTH,v1.heading),(v2.position,v2.LENGTH,v2.WIDTH,v2.heading)):
         # Shooter method to find exactly when the cars hit
-        while t2-t1>10E-6:
+        while t2-t1>10E-8:
             t=(t2+t1)/2
             v1pos[0]=v1.position[0]-v1.velocity[0]*t
             v1pos[1]=v1.position[1]-v1.velocity[1]*t
@@ -98,7 +98,7 @@ def find_initial_impact(v1: "Vehicle" = None, v2: "Vehicle" = None)->np.array:
                     ncorner+=1.
         v1.position = vpos1tmp.copy()
         v2.position = vpos2tmp.copy()
-        if ncorner < 1.
+        if ncorner < 1.:
             return corners[i,:]
         corner_avg[0] /= ncorner
         corner_avg[1] /= ncorner
