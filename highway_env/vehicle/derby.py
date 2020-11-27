@@ -86,12 +86,12 @@ def find_initial_impact(v1: "Vehicle" = None, v2: "Vehicle" = None)->np.array:
                     corner_avg[0]+=corners[i,0]
                     corner_avg[1]+=corners[i,1]
                     ncorner+=1.
-        if utils.has_corner_inside((v2pos,v2.LENGTH,v2.WIDTH,v2.heading),(v1pos,v1.LENGTH*1.01,v1.WIDTH*1.01,v1.heading)):
+        if utils.has_corner_inside((v2pos,v2.LENGTH,v2.WIDTH,v2.heading),(v1pos,v1.LENGTH,v1.WIDTH,v1.heading)):
             print(utils.has_corner_inside((v2pos,v2.LENGTH,v2.WIDTH,v2.heading),(v1pos,v1.LENGTH,v1.WIDTH,v1.heading)))
             #V2 insind V1
             corners = corner_positions(v2)
             for i in range(4):
-                if utils.point_in_rotated_rectangle(corners[i,:],v1.position,v1.LENGTH,v1.WIDTH,v1.heading):
+                if utils.point_in_rotated_rectangle(corners[i,:],v1.position,v1.LENGTH*1.01,v1.WIDTH*1.01,v1.heading):
                     print("hit")
                     corner_avg[0]+=corners[i,0]
                     corner_avg[1]+=corners[i,1]
