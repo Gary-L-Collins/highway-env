@@ -75,6 +75,7 @@ def find_initial_impact(v1: "Vehicle" = None, v2: "Vehicle" = None)->np.array:
         v1.position = v1pos.copy()
         vpos2tmp = v2.position.copy()
         v2.position = v2pos.copy()
+        print(utils.rotated_rectangles_intersect((v1pos,v1.LENGTH,v1.WIDTH,v1.heading),(v2pos,v2.LENGTH,v2.WIDTH,v2.heading)))
         # Determine which corner
         if utils.has_corner_inside((v1pos,v1.LENGTH,v1.WIDTH,v1.heading),(v2pos,v2.LENGTH,v2.WIDTH,v2.heading)):
             #V1 insind V2
@@ -99,7 +100,7 @@ def find_initial_impact(v1: "Vehicle" = None, v2: "Vehicle" = None)->np.array:
 
         return corner_avg
     else:
-        return 0.0
+        return np.array([0.0, 0.0])
 
 
 class DerbyCar(Vehicle):
