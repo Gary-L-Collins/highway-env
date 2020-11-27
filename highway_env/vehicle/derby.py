@@ -62,6 +62,7 @@ class DerbyCar(Vehicle):
                 other.crash_speed2 = self.crash_speed2
                 c = 1
             elif OtherCosAlpha>SelfCosAlpha:
+                print(SelfCosAlpha, OtherCosAlpha)
                 print(self," was hit by ",other)
                 self.got_crashed = 1
                 other.did_crash  = 1
