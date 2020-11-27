@@ -75,9 +75,11 @@ def find_initial_impact(v1: "Vehicle" = None, v2: "Vehicle" = None)->np.array:
         v1.position = v1pos.copy()
         vpos2tmp = v2.position.copy()
         v2.position = v2pos.copy()
+        print("HERE")
         print(utils.rotated_rectangles_intersect((v1pos,v1.LENGTH,v1.WIDTH,v1.heading),(v2pos,v2.LENGTH,v2.WIDTH,v2.heading)))
         # Determine which corner
         if utils.has_corner_inside((v1pos,v1.LENGTH,v1.WIDTH,v1.heading),(v2pos,v2.LENGTH,v2.WIDTH,v2.heading)):
+            print(utils.has_corner_inside((v1pos,v1.LENGTH,v1.WIDTH,v1.heading),(v2pos,v2.LENGTH,v2.WIDTH,v2.heading)))
             #V1 insind V2
             corners = corner_positions(v1)
             for i in range(4):
@@ -86,6 +88,7 @@ def find_initial_impact(v1: "Vehicle" = None, v2: "Vehicle" = None)->np.array:
                     corner_avg[1]+=corners[i,1]
                     ncorner+=1.
         if utils.has_corner_inside((v2pos,v2.LENGTH,v2.WIDTH,v2.heading),(v1pos,v1.LENGTH,v1.WIDTH,v1.heading)):
+            print(utils.has_corner_inside((v2pos,v2.LENGTH,v2.WIDTH,v2.heading),(v1pos,v1.LENGTH,v1.WIDTH,v1.heading)))
             #V2 insind V1
             corners = corner_positions(v2)
             for i in range(4):
@@ -150,8 +153,8 @@ class DerbyCar(Vehicle):
                 OtherHVec = np.array([0,0],dtype=np.float32)
                 OtherHVec[0] += CenterVectorOther[1]
                 OtherHVec[1] += -1.0*CenterVectorOther[0]
-            SelfCosAlpha = SelfHVec[0]*CenterVectorSelf[0]+SelfHVec[1]*CenterVectorSelf[1]
-            OtherCosAlpha = OtherHVec[0]*CenterVectorOther[0]+OtherHVec[1]*CenterVectorOther[1] #minus because the vector connecting two cars is pointed towards the "other" car
+            SelfCosAlpha = np.fabs(SelfHVec[0]*CenterVectorSelf[0]+SelfHVec[1]*CenterVectorSelf[1])
+            OtherCosAlpha = np.fabs(OtherHVec[0]*CenterVectorOther[0]+OtherHVec[1]*CenterVectorOther[1]) #minus because the vector connecting two cars is pointed towards the "other" car
 
             if SelfCosAlpha>OtherCosAlpha:
                 print(self," hit ",other)
@@ -164,7 +167,6 @@ class DerbyCar(Vehicle):
                 c = 1
             elif OtherCosAlpha>SelfCosAlpha:
                 print(self," was hit by ",other)
-                print(SelfCosAlpha, OtherCosAlpha)
                 self.got_crashed = 1
                 other.did_crash  = 1
                 self.crash_angle  = (self.heading - other.heading)
