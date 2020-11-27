@@ -49,8 +49,8 @@ class DerbyCar(Vehicle):
                 OtherHVec = np.array([0,0],dtype=np.float32)
                 OtherHVec[0] += CenterVector[1]
                 OtherHVec[1] += -1.0*CenterVector[0]
-            SelfCosAlpha = SelfHVec[0]*CenterVector[0]+SelfHVec[1]*CenterVector[1]
-            OtherCosAlpha = -OtherHVec[0]*CenterVector[0]-OtherHVec[1]*CenterVector[1] #minus because the vector connecting two cars is pointed towards the "other" car
+            SelfCosAlpha = abs(SelfHVec[0]*CenterVector[0]+SelfHVec[1]*CenterVector[1])
+            OtherCosAlpha = abs(-OtherHVec[0]*CenterVector[0]-OtherHVec[1]*CenterVector[1]) #minus because the vector connecting two cars is pointed towards the "other" car
 
             if SelfCosAlpha>OtherCosAlpha:
                 print(self," hit ",other)
@@ -62,7 +62,6 @@ class DerbyCar(Vehicle):
                 other.crash_speed2 = self.crash_speed2
                 c = 1
             elif OtherCosAlpha>SelfCosAlpha:
-                print(SelfCosAlpha, OtherCosAlpha)
                 print(self," was hit by ",other)
                 self.got_crashed = 1
                 other.did_crash  = 1
