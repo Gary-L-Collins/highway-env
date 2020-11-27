@@ -13,21 +13,17 @@ def corner_positions(v: "Vehicle" = None)->np.array:
     This method computes the position of each corner with a rotated car.
 
     """
-    if v is None:
-        print(v)
-        return np.array([[0,0],[0,0],[0,0],[0,0]])
-    p = np.array(v.position)
-    l = v.LENGTH
-    w = v.WIDTH
-    h = v.heading
-
-    c, s = np.cos(h), np.sin(h)
+    c1=v.position
+    l1=v.LENGTH
+    w1=v.WIDTH
+    a1=v.heading
+    c1 = np.array(c1)
+    l1v = np.array([l1/2., 0.])
+    w1v = np.array([0., w1/2.])
+    r1_points = np.array([- l1v - w1v, - l1v + w1v, + l1v - w1v, + l1v + w1v])
+    c, s = np.cos(a1), np.sin(a1)
     r = np.array([[c, -s], [s, c]])
-    corners = np.array([[l*0.5,w*0.5],[-l*0.5,w*0.5],[-l*0.5,-w*0.5],[l*0.5,-w*0.5]])
-
-    for i in range(4):
-        corners[i,:]=r.dot(corners[i,:])+p
-
+    corners = r.dot(r1_points.transpose()).transpose()
     return corners
 
 def find_initial_impact(v1: "Vehicle" = None, v2: "Vehicle" = None)->np.array:
