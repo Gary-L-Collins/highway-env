@@ -98,8 +98,11 @@ def find_initial_impact(v1: "Vehicle" = None, v2: "Vehicle" = None)->np.array:
                     ncorner+=1.
         v1.position = vpos1tmp.copy()
         v2.position = vpos2tmp.copy()
-        #if ncorner < 1.:
-        #    return corners[i,:]
+        if ncorner < 1.:
+            print("ERRROR")
+            print(vpos1tmp,vpos2tmp)
+            print(v1.heading, v2.heading)
+            return corners[i,:]
         corner_avg[0] /= ncorner
         corner_avg[1] /= ncorner
         
