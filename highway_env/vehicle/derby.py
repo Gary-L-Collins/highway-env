@@ -32,7 +32,7 @@ class DerbyCar(Vehicle):
         self.did_crash = 0
         other.got_crashed = 0
         other.did_crash = 0
-        if utils.point_in_rotated_rectangle(self.position, other.position, 0.9*other.LENGTH, 0.9*other.WIDTH, other.heading) or utils.point_in_rotated_rectangle(other.position, self.position, 0.9*self.LENGTH, 0.9*self.WIDTH, self.heading):
+        if utils.rotated_rectangles_intersect((self.position, 0.9*self.LENGTH, 0.9*self.WIDTH, self.heading),(other.position, 0.9*other.LENGTH, 0.9*other.WIDTH, other.heading))
             # Determine who hit who (striker is the one with the smallest angle between the line connecting the two centers and their heading)
             pos_self=np.array(self.position)
             pos_other=np.array(other.position)
