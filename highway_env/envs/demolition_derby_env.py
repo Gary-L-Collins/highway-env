@@ -203,7 +203,7 @@ class DemolitionDerbyEnv(AbstractEnv):
     def _is_terminal(self) -> bool:
         """The episode is over if the ego vehicle crashed or the time is out."""
         return self.vehicle.crashed or \
-            self.steps >= self.config["duration"]
+            self.steps >= self.config["duration"] * self.config["simulation_frequency"]
             #(self.config["offroad_terminal"] and not self.vehicle.on_road)
 
     def _cost(self, action: int) -> float:
