@@ -163,6 +163,7 @@ class DerbyCar(Vehicle):
                 c = 1
             elif OtherCosAlpha>SelfCosAlpha:
                 print(self," was hit by ",other)
+                print(SelfCosAlpha, OtherCosAlpha)
                 self.got_crashed = 1
                 other.did_crash  = 1
                 self.crash_angle  = (self.heading - other.heading)
