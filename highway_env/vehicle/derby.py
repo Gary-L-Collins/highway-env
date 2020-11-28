@@ -75,26 +75,21 @@ def find_initial_impact(v1: "Vehicle" = None, v2: "Vehicle" = None)->np.array:
         v1.position = v1pos.copy()
         vpos2tmp = v2.position.copy()
         v2.position = v2pos.copy()
-        print("HERE")
-        print(utils.rotated_rectangles_intersect((v1pos,v1.LENGTH,v1.WIDTH,v1.heading),(v2pos,v2.LENGTH,v2.WIDTH,v2.heading)))
         # Determine which corner
         if utils.has_corner_inside((v1pos,v1.LENGTH,v1.WIDTH,v1.heading),(v2pos,v2.LENGTH,v2.WIDTH,v2.heading)):
             print(utils.has_corner_inside((v1pos,v1.LENGTH,v1.WIDTH,v1.heading),(v2pos,v2.LENGTH,v2.WIDTH,v2.heading)))
             #V1 insind V2
             corners = corner_positions(v1)
             for i in range(4):
-                if utils.point_in_rotated_rectangle(corners[i,:],v2.position,v2.LENGTH*1.1,v2.WIDTH*1.1,v2.heading):
-                    print("hit")
+                if utils.point_in_rotated_rectangle(corners[i,:],v2pos,v2.LENGTH*1.1,v2.WIDTH*1.1,v2.heading):
                     corner_avg[0]+=corners[i,0]
                     corner_avg[1]+=corners[i,1]
                     ncorner+=1.
         if utils.has_corner_inside((v2pos,v2.LENGTH,v2.WIDTH,v2.heading),(v1pos,v1.LENGTH,v1.WIDTH,v1.heading)):
-            print(utils.has_corner_inside((v2pos,v2.LENGTH,v2.WIDTH,v2.heading),(v1pos,v1.LENGTH,v1.WIDTH,v1.heading)))
             #V2 insind V1
             corners = corner_positions(v2)
             for i in range(4):
-                if utils.point_in_rotated_rectangle(corners[i,:],v1.position,v1.LENGTH*1.1,v1.WIDTH*1.1,v1.heading):
-                    print("hit")
+                if utils.point_in_rotated_rectangle(corners[i,:],v1pos,v1.LENGTH*1.1,v1.WIDTH*1.1,v1.heading):
                     corner_avg[0]+=corners[i,0]
                     corner_avg[1]+=corners[i,1]
                     ncorner+=1.
