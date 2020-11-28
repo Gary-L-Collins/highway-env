@@ -68,12 +68,15 @@ def find_initial_impact(v1: "Vehicle" = None, v2: "Vehicle" = None)->np.array:
         
         ncorner=0.
         corner_avg=np.array([0.,0.])
+        corners1Flag = False
+        corners2Flag = False
         vpos1tmp = v1.position.copy()
         v1.position = v1pos.copy()
         vpos2tmp = v2.position.copy()
         v2.position = v2pos.copy()
         # Determine which corner
         if utils.has_corner_inside((v1pos,v1.LENGTH,v1.WIDTH,v1.heading),(v2pos,v2.LENGTH,v2.WIDTH,v2.heading)):
+            corners1Flag = True
             #V1 insind V2
             corners1 = corner_positions(v1)
             for i in range(4):
@@ -83,6 +86,7 @@ def find_initial_impact(v1: "Vehicle" = None, v2: "Vehicle" = None)->np.array:
                     ncorner+=1.
 
         if utils.has_corner_inside((v2pos,v2.LENGTH,v2.WIDTH,v2.heading),(v1pos,v1.LENGTH,v1.WIDTH,v1.heading)):
+            corners2Flag = True
             #V2 insind V1
             corners2 = corner_positions(v2)
             for i in range(4):
@@ -95,12 +99,23 @@ def find_initial_impact(v1: "Vehicle" = None, v2: "Vehicle" = None)->np.array:
         v2.position = vpos2tmp.copy()
         
         if ncorner < 1.:
-            indx1 = np.argmin(np.linalg.norm(corners1-np.array(v2pos),axis=1))
-            indx2 = np.argmin(np.linalg.norm(corners2-np.array(v1pos),axis=1))
-            if np.linalg.norm(corners1[indx1,:]-np.array(v2pos)) < np.linalg.norm(corners2[indx2,:]-np.array(v1pos)):
-                return corners1[indx1,:]
+            if corners1Flag:
+                indx1 = np.argmin(np.linalg.norm(corners1-np.array(v2pos),axis=1))
+                cVal1=np.linalg.norm(corners1[indx1,:]-np.array(v2pos))
             else:
+                cVal1=10000.
+            if corners2Flag:
+                indx2 = np.argmin(np.linalg.norm(corners2-np.array(v1pos),axis=1))
+                cVal2=np.linalg.norm(corners2[indx2,:]-np.array(v1pos))
+            else:
+                cVal2=10000.
+
+            if  cVal1 < cVal2:
+                return corners1[indx1,:]
+            elif cVal2 < cVal1:
                 return corners2[indx2,:]
+            else:
+                return np.array([0.,0.])
 
         corner_avg[0] /= ncorner
         corner_avg[1] /= ncorner
